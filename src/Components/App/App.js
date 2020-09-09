@@ -12,7 +12,7 @@ class App extends React.Component {
     this.state = {
       searchResults: [],
       playlistTracks: [],
-      playlistName:  "New Playlist"
+      playlistName:  "Nova Playlist"
     }
     this.search = this.search.bind(this); 
     this.addTrack = this.addTrack.bind(this);
@@ -67,7 +67,7 @@ class App extends React.Component {
   render() {
     return (
       <div>
-        <h1>Ja<span className="highlight">mmm</span>ing</h1>
+        <h1>Easy <span className="highlight">Play</span>list</h1>
         <div className="App">
           <SearchBar onSearch={this.search}/>
           <div className="App-playlist">

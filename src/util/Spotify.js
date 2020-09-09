@@ -1,6 +1,7 @@
 
 const clientID = 'e9a1d274a4f440cfa78ce5fcf63708fc';
-const redirectUri = 'http://localhost:3000/'; 
+//const redirectUri = 'http://localhost:3000/';
+const redirectUri = 'http://easy-playlist.surge.sh'; 
 let accessToken;
 
 const Spotify = {
