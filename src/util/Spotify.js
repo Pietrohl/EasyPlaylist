@@ -24,7 +24,7 @@ const Spotify = {
             window.history.pushState('Access Token', null, '/');
             return accessToken;
         } else {
-            const accessUrl = `https://accounts.spotify.com/authorize?client_id=${clientID}&redirect_uri=${redirectUri}&scope=playlist-modify-private&response_type=token`
+            const accessUrl = `https://accounts.spotify.com/authorize?client_id=${clientID}&response_type=token&scope=playlist-modify-private&redirect_uri=${redirectUri}`;
             window.location = accessUrl;
         }
     },
@@ -58,7 +58,7 @@ const Spotify = {
         let accessTokenSave = this.getAccessToken();
         const headers = {'Content-Type': 'application/json',
                         Authorization: `Bearer ${accessTokenSave}`};
-        let userId; // = '12178898226';
+        let userId;
         
         return fetch('https://api.spotify.com/v1/me', {headers: headers}).then(response => response.json()
         ).then(jsonResponse => {
@@ -79,7 +79,7 @@ const Spotify = {
                     body: JSON.stringify({"uris": uris})
                 })
             })
-        }).then(function(response) {console.log(response.status)})
+        })
         
     }
 
