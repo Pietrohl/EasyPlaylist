@@ -46,7 +46,7 @@ const Spotify = {
     });
   },
 
-  savePlaylist(name, trackUris) {
+  async savePlaylist(name, trackUris) {
     if (!name || !trackUris.length) {
       return;
     }
@@ -54,25 +54,58 @@ const Spotify = {
     const accessToken = Spotify.getAccessToken();
     const headers = { Authorization: `Bearer ${accessToken}` };
     let userId;
+  
+    try {
+      const response = await fetch('https://api.spotify.com/v1/me', {headers: headers}
+      ).then(async (response) => {
+        
+          if(response.ok) {
+            return await response.json();
+          }
 
-    return fetch('https://api.spotify.com/v1/me', {headers: headers}
-    ).then(response => response.json()
-    ).then(jsonResponse => {
-      userId = jsonResponse.id;
-      return fetch(`https://api.spotify.com/v1/users/${userId}/playlists`, {
-        headers: headers,
-        method: 'POST',
-        body: JSON.stringify({name: name, public: true})
-      }).then(response => response.json()
-      ).then(jsonResponse => {
-        const playlistId = jsonResponse.id;
-        return fetch(`https://api.spotify.com/v1/users/${userId}/playlists/${playlistId}/tracks`, {
+        }
+      ).then(async (jsonResponse) => {
+        userId = jsonResponse.id;
+        try {
+        const response = await fetch(`https://api.spotify.com/v1/users/${userId}/playlists`, {
           headers: headers,
           method: 'POST',
-          body: JSON.stringify({uris: trackUris})
+          body: JSON.stringify({name: name, public: true})
+        }).then(async (response) =>  {
+        
+          if(response.ok) {
+            return await response.json();
+          }
+
+        }
+        ).then(async (jsonResponse) => {
+          const playlistId = jsonResponse.id;
+          try { 
+            const response = await fetch(`https://api.spotify.com/v1/users/${userId}/playlists/${playlistId}/tracks`, {
+              headers: headers,
+              method: 'POST',
+              body: JSON.stringify({uris: trackUris})
+            });
+            return response;
+            
+          } catch(error){
+            console.log(error.message);
+          }        
         });
-      });
-    }).then(function(response) {console.log(response.status)});
+
+        return response;
+
+        } catch (error) {
+          console.log(error.message);
+        }
+
+      }).then(function(response) {console.log(response.status)});
+
+      return response;
+
+    } catch(error) {
+      console.log(error.message);
+    }
   }
 };
 
