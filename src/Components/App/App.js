@@ -4,6 +4,7 @@ import SearchBar from '../SearchBar/SearchBar'
 import SearchResults from  '../SearchResults/SearchResults'
 import Playlist from '../Playlist/Playlist'
 import Spotify from '../../util/Spotify'
+import PlaylistList from '../PlaylistList/PlaylistList'
 
 class App extends React.Component {
   constructor(props) {
@@ -12,18 +13,26 @@ class App extends React.Component {
     this.state = {
       searchResults: [],
       playlistTracks: [],
-      playlistName:  "Nova Playlist"
+      playlistName:  "Nova Playlist",
+      playlistList: [],
+      currentPlaylistId: null
     }
     this.search = this.search.bind(this); 
     this.addTrack = this.addTrack.bind(this);
     this.removeTrack = this.removeTrack.bind(this);
     this.updatePlaylistName = this.updatePlaylistName.bind(this);
     this.savePlaylist = this.savePlaylist.bind(this);
+    this.selectPlaylist = this.selectPlaylist.bind(this);
   }
 
-  componentDidMount(){
-    window.addEventListener('load', () => {Spotify.getAccessToken()})
+  async componentDidMount(){
+    await window.addEventListener('load', () => {Spotify.getAccessToken()})
+    await window.addEventListener('load', () => {Spotify.getUserPlaylists().then(results => this.setState({
+      playlistList: results 
+    }))})
   }
+
+  
 
   search(searchTerm){
     Spotify.search(searchTerm).then(newResults =>  this.setState({
@@ -53,15 +62,37 @@ class App extends React.Component {
     })
   }
 
-  savePlaylist() {
+  async savePlaylist() {
     let trackURIs = this.state.playlistTracks.map(playlistTrack => playlistTrack.uri);
-    
-    Spotify.savePlaylist(this.state.playlistName, trackURIs).then(() => {
+    Spotify.savePlaylist(this.state.playlistName, trackURIs,this.state.currentPlaylistId).then(() => {
       this.setState({
         playlistTracks: []
       })
-      this.updatePlaylistName("Name");
-    })
+      this.updatePlaylistName('Name');
+    });
+    Spotify.getUserPlaylists().then(results => this.setState({
+      playlistList: results 
+    }));
+    setTimeout(() => {
+      Spotify.getUserPlaylists().then(results => this.setState({
+      playlistList: results 
+    }));
+    }, 5000);
+
+  }
+
+  async selectPlaylist(playlist) {
+      let  loadedPlaylist = await Spotify.getPlaylist(playlist.id);
+      this.setState({
+        currentPlaylistId: playlist.id
+      })
+      if(loadedPlaylist) {
+          this.setState({
+            playlistName: playlist.name,
+            playlistTracks: loadedPlaylist
+        })
+    }
+    
   }
 
   render() {
@@ -73,6 +104,7 @@ class App extends React.Component {
           <div className="App-playlist">
             <SearchResults results={this.state.searchResults} onAdd={this.addTrack} />
             <Playlist playlistTracks={this.state.playlistTracks} name={this.state.playlistName} onRemove={this.removeTrack} onNameChange={this.updatePlaylistName} onSave={this.savePlaylist}/>
+            <PlaylistList playlistList={this.state.playlistList} selectPlaylist={this.selectPlaylist}  />
           </div>
         </div>
       </div>
