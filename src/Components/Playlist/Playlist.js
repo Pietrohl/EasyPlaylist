@@ -13,11 +13,14 @@ componentWillReceiveProps (){
     this.renderAction();
 
 }
+componentDidMount () {
+    this.renderAction();
+}
 
     renderAction () {
         return (
-            //this.state.isRemoval ? <button className="Track-action" onClick={this.removeTrack}>-</button> : <button className="Track-action" onClick={this.addTrack}>+</button> 
-            <input defaultValue={this.props.name} value={this.props.name} onChange={this.handleNameChange} />
+            
+            <input defaultValue='' value={this.props.name} onChange={this.handleNameChange} />
             )        
     }
 
